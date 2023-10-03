@@ -1,7 +1,9 @@
 ﻿import { Engine } from './engine';
 import { Entity } from './entity';
 
-export interface Action { }
+export interface Action {
+    perform: (engine: Engine, entity: Entity) => void;
+}
 
 export class MovementAction implements Action {
     dx: number;
