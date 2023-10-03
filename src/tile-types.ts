@@ -13,11 +13,11 @@ export interface Tile {
 export const FLOOR_TILE: Tile = {
     walkable: true,
     transparent: true,
-    dark: { char: ' ', fg: '#fff', bg: '#3c0505' },
+    dark: { char: '.', fg: '#1b0202', bg: '#3c0505' },
 };
 
 export const WALL_TILE: Tile = {
+    dark: { char: '~', fg: '#1b0202', bg: '#000' },
     walkable: false,
     transparent: false,
-    dark: { char: ' ', fg: '#fff', bg: '#1b0202' },
 };

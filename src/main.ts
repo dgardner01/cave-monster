@@ -11,7 +11,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const npc = new Entity(
         Engine.WIDTH / 2 - 5,
         Engine.HEIGHT / 2,
-        '@',
+        'x',
         '#ffff00',
     );
     const player = new Entity(Engine.WIDTH / 2, Engine.HEIGHT / 2, '@');
