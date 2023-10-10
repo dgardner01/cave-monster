@@ -19,7 +19,7 @@ export const FLOOR_TILE: Tile = {
     visible: false,
     seen: false,
     dark: { char: '*', fg: '#000000', bg: '#000000' },
-    light: { char: '.', fg: '#aa0000', bg: '#ff5555' },
+    light: { char: '.', fg: '#ff5555', bg: '#000000' },
 };
 
 export const WALL_TILE: Tile = {
@@ -28,5 +28,5 @@ export const WALL_TILE: Tile = {
     visible: false,
     seen: false,
     dark: { char: '*', fg: '#aa0000', bg: '#000000' },
-    light: { char: '#', fg: '#ff5555', bg: '#aa0000' },
+    light: { char: '#', fg: '#aa0000', bg: '#000000' },
 };

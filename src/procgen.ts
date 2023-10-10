@@ -1,7 +1,30 @@
 import { GameMap } from './game-map';
 import { FLOOR_TILE, WALL_TILE, Tile } from './tile-types';
 import { Display } from 'rot-js';
-import { Entity } from './entity';
+import {
+    Entity,
+    spawnStalactite,
+    spawnStalagmite,
+    spawnSmallBat,
+    spawnBigBat,
+    spawnPuddle,
+    spawnRoots,
+    spawnCoins,
+    spawnCoffin,
+    spawnHuman,
+    spawnCursed,
+    spawnLeech,
+    spawnJacket,
+    spawnCoatOfArms1,
+    spawnCoatOfArms2,
+} from './entity';
+
+interface Bounds {
+    x1: number;
+    y1: number;
+    x2: number;
+    y2: number;
+}
 
 class RectangularRoom {
     tiles: Tile[][];
@@ -27,13 +50,20 @@ class RectangularRoom {
             this.tiles[y] = row;
         }
     }
-
     get center(): [number, number] {
         const centerX = this.x + Math.floor(this.width / 2);
         const centerY = this.y + Math.floor(this.height / 2);
         return [centerX, centerY];
     }
 
+    get bounds(): Bounds {
+        return {
+            x1: this.x,
+            y1: this.y,
+            x2: this.x + this.width,
+            y2: this.y + this.height,
+        }
+    }
     intersects(other: RectangularRoom): boolean {
         return (
             this.x <= other.x + other.width &&
@@ -44,16 +74,75 @@ class RectangularRoom {
     }
 }
 
+function placeEntities(
+    room: RectangularRoom,
+    dungeon: GameMap,
+    maxEntities: number,
+    ) {
+    const numberOfEntitiesToAdd = 2 + generateRandomNumber(2, maxEntities);
+    for (let i = 0; i < numberOfEntitiesToAdd; i++) {
+        const bounds = room.bounds;
+        const x = generateRandomNumber(bounds.x1 + 2, bounds.x2 - 2);
+        const y = generateRandomNumber(bounds.y1 + 2, bounds.y2 - 2);
+        const numEntities = 14;
+        if (!dungeon.entities.some((e) => e.x == x && e.y == y)) {
+            if (Math.random() < 1 / numEntities) {
+                dungeon.entities.push(spawnStalagmite(x, y));
+            }
+            else if (Math.random() < 2 / numEntities) {
+                dungeon.entities.push(spawnSmallBat(x, bounds.y1-2));
+            }
+            else if (Math.random() < 3 / numEntities) {
+                dungeon.entities.push(spawnBigBat(x, bounds.y1-2));
+            }
+            else if (Math.random() < 4 / numEntities) {
+                dungeon.entities.push(spawnPuddle(x, y));
+            }
+            else if (Math.random() < 5 / numEntities) {
+                dungeon.entities.push(spawnStalactite(x, y));
+            }
+            else if (Math.random() < 6 / numEntities) {
+                dungeon.entities.push(spawnRoots(x, y));
+            }
+            else if (Math.random() < 7 / numEntities) {
+                dungeon.entities.push(spawnCoffin(x, y));
+            }
+            else if (Math.random() < 8 / numEntities) {
+                dungeon.entities.push(spawnCoins(x, y));
+            }
+            else if (Math.random() < 9 / numEntities) {
+                dungeon.entities.push(spawnCursed(x, y));
+            }
+            else if (Math.random() < 10 / numEntities) {
+                dungeon.entities.push(spawnLeech(x, y));
+            }
+            else if (Math.random() < 11 / numEntities) {
+                dungeon.entities.push(spawnJacket(x, y));
+            }
+            else if (Math.random() < 12 / numEntities) {
+                dungeon.entities.push(spawnHuman(x, y));
+            }
+            else if (Math.random() < 13 / numEntities) {
+                dungeon.entities.push(spawnCoatOfArms1(x, y));
+            }
+            else if (Math.random() < 14 / numEntities) {
+                dungeon.entities.push(spawnCoatOfArms2(x, y));
+            }
+        }
+    }
+    }
+
 export function generateDungeon(
     mapWidth: number,
     mapHeight: number,
     maxRooms: number,
     minSize: number,
     maxSize: number,
+    maxEntities: number,
     player: Entity,
     display: Display,
 ): GameMap {
-    const dungeon = new GameMap(mapWidth, mapHeight, display);
+    const dungeon = new GameMap(mapWidth, mapHeight, display, [player]);
 
     const rooms: RectangularRoom[] = [];
 
@@ -71,7 +160,7 @@ export function generateDungeon(
         }
 
         dungeon.addRoom(x, y, newRoom.tiles);
-
+        placeEntities(newRoom, dungeon, maxEntities);
         rooms.push(newRoom);
     }
 
@@ -92,7 +181,7 @@ export function generateDungeon(
 }
 
 function generateRandomNumber(min: number, max: number) {
-    return Math.floor(Math.random() * (max - min) + min);
+    return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
 function* connectRooms(
@@ -109,7 +198,7 @@ function* connectRooms(
     // set our axisIndex to 0 (x axis) if horizontal or 1 (y axis) if vertical
     let axisIndex = horizontal ? 0 : 1;
 
-    console.log(current, end);
+    //console.log(current, end);
     // we'll loop until our current is the same as the end point
     while (current[0] !== end[0] || current[1] !== end[1]) {
         //are we tunneling in the positive or negative direction?

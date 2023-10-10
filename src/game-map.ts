@@ -11,6 +11,7 @@ export class GameMap {
         public width: number,
         public height: number,
         public display: Display,
+        public entities: Entity[],
     ) {
         this.tiles = new Array(this.height);
         for (let y = 0; y < this.height; y++) {
@@ -20,6 +21,22 @@ export class GameMap {
             }
             this.tiles[y] = row;
         }
+    }
+
+    public get nonPlayerEntities(): Entity[] {
+        return this.entities.filter((e) => e.name !== 'Player');
+    }
+
+    getBlockingEntityAtLocation(x: number, y: number): Entity | undefined {
+        return this.entities.find(
+            (e) => e.blocksMovement && e.x === x && e.y === y,
+        );
+    }
+
+    getNonBlockingEntityAtLocation(x: number, y: number): Entity | undefined {
+        return this.entities.find(
+            (e) => !e.blocksMovement && e.x === x && e.y === y,
+        );
     }
 
     isInBounds(x: number, y: number) {
@@ -82,5 +99,10 @@ export class GameMap {
                 this.display.draw(x, y, char, fg, bg);
             }
         }
+        this.entities.forEach((e) => {
+            if (this.tiles[e.y][e.x].visible) {
+                this.display.draw(e.x, e.y, e.char, e.fg, e.bg);
+            }
+        });
     }
 }

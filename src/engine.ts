@@ -4,24 +4,24 @@ import { handleInput } from './input-handler';
 import { Entity } from './entity';
 import { GameMap } from './game-map';
 import { generateDungeon } from './procgen';
+import { MessageLog } from './message-log';
 
 export class Engine {
-    public static readonly WIDTH = 80;
-    public static readonly HEIGHT = 50;
-    public static readonly MAP_WIDTH = 80;
-    public static readonly MAP_HEIGHT = 45;
+    public static readonly WIDTH = 64;
+    public static readonly HEIGHT = 40;
+    public static readonly MAP_WIDTH = 64;
+    public static readonly MAP_HEIGHT = 32;
     public static readonly MIN_ROOM_SIZE = 6;
     public static readonly MAX_ROOM_SIZE = 10;
     public static readonly MAX_ROOMS = 30;
+    public static readonly MAX_ENTITIES_PER_ROOM = 20;
 
     display: ROT.Display;
     gameMap: GameMap;
-
+    messageLog: MessageLog;
     player: Entity;
-    entities: Entity[];
 
-    constructor(entities: Entity[], player: Entity) {
-        this.entities = entities;
+    constructor(player: Entity) {
         this.player = player;
 
         this.display = new ROT.Display({
@@ -31,6 +31,35 @@ export class Engine {
         });
         const container = this.display.getContainer()!;
         document.body.appendChild(container);
+        this.messageLog = new MessageLog();
+        this.messageLog.addMessage(
+            '==================================',
+            '#ffffff',
+        );
+        this.messageLog.addMessage(
+            '===  LEECHCRAFT: CAVE MONSTER  ===',
+            '#ffffff',
+        );
+        this.messageLog.addMessage(
+            '==================================',
+            '#ffffff',
+        );
+        this.messageLog.addMessage(
+            '===    MOVE WITH ARROW KEYS    ===',
+            '#ffffff',
+        );
+        this.messageLog.addMessage(
+            '===   WALK INTO TO INTERACT    ===',
+            '#ffffff',
+        );
+        this.messageLog.addMessage(
+            '=== REFRESH TO REGENERATE CAVE ===',
+            '#ffffff',
+        );
+        this.messageLog.addMessage(
+            '==================================',
+            '#ffffff',
+        );
 
         this.gameMap = generateDungeon(
             Engine.MAP_WIDTH,
@@ -38,6 +67,7 @@ export class Engine {
             Engine.MAX_ROOMS,
             Engine.MIN_ROOM_SIZE,
             Engine.MAX_ROOM_SIZE,
+            Engine.MAX_ENTITIES_PER_ROOM,
             player,
             this.display,
         );
@@ -63,9 +93,7 @@ export class Engine {
     }
 
     render() {
+        this.messageLog.render(this.display, 0, 30, 60, 9);
         this.gameMap.render();
-        this.entities.forEach((e) => {
-            this.display.draw(e.x, e.y, e.char, e.fg, e.bg);
-        });
     }
 }
